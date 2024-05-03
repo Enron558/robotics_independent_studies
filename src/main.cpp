@@ -9,7 +9,7 @@
 
 // Examine your robot leg to see if you built a left leg or a right leg.
 // Then replace kUnspecified with the correct side.
-const BodySide kLegSide = BodySide::kUnspecified; // Replace with BodySide::kLeft or BodySide::kRight
+const BodySide kLegSide = BodySide::kLeft; // Replace with BodySide::kLeft or BodySide::kRight
 /*********************************************************/
 
 #define DO_TESTS = // comment out to skip running tests before executing main program
@@ -18,10 +18,12 @@ long last_command = 0; // To keep track of when we last commanded the motors
 C610Bus<CAN1> bus_front;     // Initialize the Teensy's CAN bus to talk to the motors
 C610Bus<CAN2> bus_back;
 
-const int LOOP_DELAY_MILLIS = 1; // Wait for 0.005s between motor updates.
+const int LOOP_DELAY_MILLIS = 0.005; // Wait for 0.005s between motor updates.
 
-const float m1_offset = 0.0;
-const float m2_offset = 0.0;
+// Placeholder values for now, measure with ruler on Friday
+const float m1_offset = 0.0; // Length of leg with end-effactor
+const float m2_offset = 0.0; // Length of leg with thigh 
+// const float hip_offset = 3.0; // Length of hip (the base)
 
 typedef struct {
   float pos;
@@ -114,7 +116,20 @@ void loop()
     // PART ONE: Bad Robot Surgeon
     // TODO: Steps 1.5, 6, 9, 10. update all the motor states according to their ID, indexed at 0
     // HINT: Use the updateState and updateCmd functions similar to lab 1. Remember that there are both a front and a back CAN bus.
-    
+    for (int i = 0; i > 0; i++){
+        updateState(&back_state[i], i, 0);
+    }
+    for (int i = 0; i > 0; i++){
+        updateCmd(&back_state[i], 0.7, Kp, Kd);
+    }
+
+    for (int i = 0; i > 0; i++){
+        updateState(&front_state[i], i, 0);
+    }
+    for (int i = 0; i > 0; i++){
+        updateCmd(&front_state[i], back_state[i].pos, Kp, Kd);
+    }
+
     // Sanitizes your computed current commands to make the robot safer. Use this for all parts, leave as is.
     for (int i = 0; i < 3; i++) {
       sanitize_current_command(back_state[i].cmd, back_state[i].pos, back_state[i].vel); // sanitize right leg commands
@@ -143,14 +158,14 @@ void loop()
     }
 
     //PART TWO: Forward Kinematics
-    //Uncomment this block when starting the forward kinematics part. This for loop gets the actuator angles for each motor
-    // for (int i = 0; i < 3; i++)
-    // {
-    //   actuator_angles(i) = bus_front.Get(i).Position();
-    //   actuator_velocities(i) = bus_front.Get(i).Velocity();
-    // }
-    // BLA::Matrix<3> cartesian_coordinates = forward_kinematics(actuator_angles, pupper_leg_config); // This line finds the cartesian coordinates from the forward kinematics function
-    // print_vector(cartesian_coordinates); // use the print_vector functin to cleanly print out the cartesian coordinates
+    // Uncomment this block when starting the forward kinematics part. This for loop gets the actuator angles for each motor
+    for (int i = 0; i < 3; i++)
+    {
+      actuator_angles(i) = bus_front.Get(i).Position();
+      actuator_velocities(i) = bus_front.Get(i).Velocity();
+    }
+    BLA::Matrix<3> cartesian_coordinates = forward_kinematics(actuator_angles, pupper_leg_config); // This line finds the cartesian coordinates from the forward kinematics function
+    print_vector(cartesian_coordinates); // use the print_vector functin to cleanly print out the cartesian coordinates
 
     // TODO: Step 14. Create a Safety Box
     // Check if the cartesian coordinates are outside a box you determine. If outside, print OUTSIDE SAFETY BOX

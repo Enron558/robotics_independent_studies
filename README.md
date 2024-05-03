@@ -5,3 +5,4 @@ cd lab_2_bad_robot_surgeon_solutions
 git submodule init
 git submodule update
 ```
+# robotics_independent_studies
