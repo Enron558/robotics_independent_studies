@@ -79,10 +79,11 @@ BLA::Matrix<3> forward_kinematics(const BLA::Matrix<3> &joint_angles, const Kine
   BLA::Matrix<3> T2 = translation_matrix(config.l[1], 'z');
   BLA::Matrix<3> T1 = translation_matrix(config.l[0], 'y');
 
-  BLA::Matrix<3> translated_T3 = (rotation_matrix(joint_angles(2), 'xz')) * T3;
-
+  BLA::Matrix<3> translated_T3 = rotation_matrix(joint_angles(2), 'xz') * T3;
+  BLA::Matrix<3> translated_T3_T2 = rotation_matrix(joint_angles(1), 'xz') * (T2 + translated_T3);
+  BLA::Matrix<3> translated_T3_T2_T1 = rotation_matrix(joint_angles(0), 'xy') * (T1 + translated_T3_T2 + translated_T3);
   
-  return BLA::Matrix<3>(0, 0, 0);
+  return translated_T3_T2_T1;
 }
 
 BLA::Matrix<3> inverse_kinematics(const BLA::Matrix<3> &target_location, const KinematicsConfig &config)
