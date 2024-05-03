@@ -36,22 +36,25 @@ BLA::Matrix<3,3> rotation_matrix(const float theta, const char axis)
   }
 } 
 
-BLA::Matrix<3,3> translation_matrix(const float value, const char axis)
+BLA::Matrix<3> translation_matrix(const float value, const char axis)
 {
   if (axis == 'x'){
     BLA::Matrix<3> T = (value,
                         0,
                         0);
+    return T;
   }
   else if (axis == 'y'){
     BLA::Matrix<3> T = (0,
                         value,
                         0);
+    return T;
   }
   else if (axis == 'z'){
     BLA::Matrix<3> T = (0,
                         0,
                         value);
+    return T;
   }
 } 
 
@@ -71,6 +74,13 @@ BLA::Matrix<3> forward_kinematics(const BLA::Matrix<3> &joint_angles, const Kine
       Call each transformation helper function together in this FK function, returning the cartesian coordinates in x, y, z
       Return: 3x1 Vector (BLA::Matrix<3,1>) for the x, y, z cartesian coordinates
   */ 
+
+  BLA::Matrix<3> T3 = translation_matrix(config.l[2], 'z');
+  BLA::Matrix<3> T2 = translation_matrix(config.l[1], 'z');
+  BLA::Matrix<3> T1 = translation_matrix(config.l[0], 'y');
+
+  BLA::Matrix<3> translated_T3 = (rotation_matrix(joint_angles(2), 'xz')) * T3;
+
   
   return BLA::Matrix<3>(0, 0, 0);
 }
